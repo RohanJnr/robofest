@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url("../images/funky-lines.png");
+    background-repeat: repeat;
+}
+
+main {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(236, 46, 12, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
