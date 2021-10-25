@@ -3,11 +3,11 @@ let state;
 
 // states: in-queue, in-game, idle, awaiting-start, fail-start
 const stateMapping = {
-    "in-queue": inQueueState(),
-    "in-game": inGameState(),
-    "idle": idleState(),
-    "awaiting-start": awaitingStartState(),
-    "fail-start": failStartState(),
+    "in-queue": inQueueState,
+    "in-game": inGameState,
+    "idle": idleState,
+    "awaiting-start": awaitingStartState,
+    "fail-start": failStartState,
 }
 
 
@@ -16,6 +16,7 @@ function inQueueState(data) {
 }
 
 function inGameState(data) {
+    console.log("You are in game, put ur gesture in 5 seconds.")
 
 }
 

@@ -109,10 +109,8 @@ function startProtocol(data) {
 }
 
 function resultProtocol(data) {
-  const username = data.username
-
   playerState[username].score += data.score
-  playerState[username].rounds += data.rounds
+  playerState[username].rounds += 1
   playerState[username].state = "idle"
 
   // broadcastState()
