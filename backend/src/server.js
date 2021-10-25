@@ -50,13 +50,13 @@ function dashboardInfo() {
     currentPlayer    
   }
 
-  db.collection("users").add(dashinfo)
-  .then((docRef) => {
-      console.log("Document written with ID: ", docRef.id);
-  })
-  .catch((error) => {
-      console.error("Error adding document: ", error);
-  });
+  // db.collection("users").add(dashinfo)
+  // .then((docRef) => {
+  //     console.log("Document written with ID: ", docRef.id);
+  // })
+  // .catch((error) => {
+  //     console.error("Error adding document: ", error);
+  // });
 
 
   console.log(dashinfo)
@@ -71,17 +71,20 @@ function playProtocol(data, ws) {
 
   usernameWsMap[username] = ws
 
-  playerState[username] = {
-    score: 0,
-    rounds: 0,
-    state: "in-queue",
-    queuePosition: 0
+  if (!playerState.hasOwnProperty(username)){
+    playerState[username] = {
+      score: 0,
+      rounds: 0,
+      state: "in-queue",
+      queuePosition: 0
+    }
   }
+  
   if (currentPlayer === null){
     currentPlayer = username
     playerState[username]["state"] = "in-game"
 
-    initiateGame(username)
+    initiateRound(username)
     return
   }
 
@@ -93,26 +96,41 @@ function playProtocol(data, ws) {
 
 }
 
-function initiateGame(username) {
-  for (let i=0; i<3; i++){
-    camClient.send(JSON.stringify({
-      state: "play",
-    }))
-    usernameWsMap[username].send(JSON.stringify(playerState[username]))
-  }
+function initiateRound(username) {
+  camClient.send(JSON.stringify({
+    state: "play",
+  }))
+  usernameWsMap[username].send(JSON.stringify(playerState[username]))
   
 }
 
 function startProtocol(data) {
+  // not required
   const username = data.username
 
 }
 
 function resultProtocol(data) {
-  playerState[username].score += data.score
-  playerState[username].rounds += 1
-  playerState[username].state = "idle"
+  playerState[currentPlayer].score += data.score
+  playerState[currentPlayer].rounds += 1
+  dashboardInfo()
+  if (playerState[currentPlayer].rounds % 3 !== 0){
+    // 1 match is 3 rounds.
+    console.log("Another round.")
+    initiateRound(currentPlayer)
+    return
+  }
 
+  else {
+    console.log("No rounds.")
+    // done playing 1 match
+    playerState[currentPlayer].state = "idle"
+    usernameWsMap[currentPlayer].send(JSON.stringify(playerState[currentPlayer]))
+
+    currentPlayer = null
+
+    dashboardInfo()
+  }
   // broadcastState()
 }
 

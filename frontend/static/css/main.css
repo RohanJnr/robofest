@@ -22,3 +22,7 @@ main {
     display: flex;
     flex-direction: column;
 }
+
+.invis {
+    display: none;
+}
