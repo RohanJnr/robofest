@@ -21,8 +21,8 @@ firebase.initializeApp({
 
 let db = firebase.firestore();
 
-
-let currentPlayer = null
+let camClient = null // ws
+let currentPlayer = null // username
 const activePlayerQueue = [] // usernames
 const usernameWsMap = {} // username: ws
 const playerState = {} // username:score,rounds,state
@@ -58,6 +58,8 @@ function dashboardInfo() {
       console.error("Error adding document: ", error);
   });
 
+
+  console.log(dashinfo)
   // TODO send to camera/image processing client.
   // ...
 
@@ -78,7 +80,8 @@ function playProtocol(data, ws) {
   if (currentPlayer === null){
     currentPlayer = username
     playerState[username]["state"] = "in-game"
-    ws.send(JSON.stringify(playerState[username]))
+
+    initiateGame(username)
     return
   }
 
@@ -86,8 +89,18 @@ function playProtocol(data, ws) {
 
   playerState[username]["queuePosition"] = activePlayerQueue.indexOf(username) + 1
 
-  ws.send(JSON.stringify(playerState[ws]))
+  ws.send(JSON.stringify(playerState[username]))
 
+}
+
+function initiateGame(username) {
+  for (let i=0; i<3; i++){
+    camClient.send(JSON.stringify({
+      state: "play",
+    }))
+    usernameWsMap[username].send(JSON.stringify(playerState[username]))
+  }
+  
 }
 
 function startProtocol(data) {
@@ -98,11 +111,11 @@ function startProtocol(data) {
 function resultProtocol(data) {
   const username = data.username
 
-  playerState[username].score = data.score
-  playerState[username].rounds = data.rounds
+  playerState[username].score += data.score
+  playerState[username].rounds += data.rounds
   playerState[username].state = "idle"
 
-  broadcastState()
+  // broadcastState()
 }
 
 
@@ -132,7 +145,10 @@ wss.on('connection', ws => {
 
   ws.on('message', message => {
     let data = JSON.parse(message)
-    
+    if (data.username === "camCamera-123456"){
+      camClient = ws
+      return
+    }
     protoclMap[data.protocol](data, ws)
     dashboardInfo()
   })
