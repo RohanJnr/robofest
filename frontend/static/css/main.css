@@ -5,11 +5,11 @@
 }
 
 body {
-    background-color: red;
+    background-image: url("../images/funky-lines.png");
+    background-repeat: repeat;
 }
 
 main {
-    background-image: url("../images/funky-lines.png");
 
     height: 100vh;
     width: 100vw;

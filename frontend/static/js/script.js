@@ -89,7 +89,7 @@ function failStartState(data) {
 }
 
 
-const ws = new WebSocket("ws://localhost:8080")
+const ws = new WebSocket("ws://64.227.179.101:8080")
 
 
 usernameForm.addEventListener("submit", event => {
