@@ -10,7 +10,8 @@ const score = document.getElementById("score-value")
 const round = document.getElementById("round-value")
 
 
-const content_button = document.getElementById("play-button")
+const contentButton = document.getElementById("play-button")
+const formHeading = document.getElementById("form-heading")
 
 const invisClass = "invis"
 
@@ -23,7 +24,7 @@ if (document.cookie){
     usernameForm.classList.add(invisClass)
     contentDiv.classList.remove(invisClass)
 
-    content_button.classList.remove(invisClass)
+    contentButton.classList.remove(invisClass)
 }
 
 function setContentDiv(heading1Value, paragraphValue, heading2Value, scoreValue, roundValue){
@@ -44,15 +45,25 @@ const stateMapping = {
     "idle": idleState,
     "awaiting-start": awaitingStartState,
     "fail-start": failStartState,
+    "waiting": waitingState,
+    "duplicate-username": duplicateUsername,
 }
 
+function duplicateUsername(data) {
+    formHeading.innerHTML = "Username already taken!"
+}
+
+function waitingState(data) {
+    formHeading.innerHTML = "Waiting for another user to finish playing, please try again later."
+}
 
 function inQueueState(data) {
 
 }
 
 function inGameState(data) {
-    content_button.classList.add(invisClass)
+    formHeading.innerHTML = ""
+    contentButton.classList.add(invisClass)
     console.log(data)
     usernameForm.classList.add(invisClass)
     contentDiv.classList.remove(invisClass)
@@ -76,7 +87,7 @@ function idleState(data) {
     )
     console.log("idle state")
 
-    content_button.classList.remove(invisClass)
+    contentButton.classList.remove(invisClass)
     
 }
 
@@ -90,6 +101,7 @@ function failStartState(data) {
 
 
 const ws = new WebSocket("ws://64.227.179.101:8080")
+// const ws = new WebSocket("ws://localhost:8080")
 
 
 usernameForm.addEventListener("submit", event => {
@@ -104,7 +116,7 @@ usernameForm.addEventListener("submit", event => {
         ))
 })
 
-content_button.addEventListener("click", event => {
+contentButton.addEventListener("click", event => {
     ws.send(JSON.stringify(
         {
             protocol: "play",

@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const path = require('path');
+
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app);
@@ -71,20 +73,43 @@ function playProtocol(data, ws) {
 
   usernameWsMap[username] = ws
 
-  if (!playerState.hasOwnProperty(username)){
-    playerState[username] = {
-      score: 0,
-      rounds: 0,
-      state: "in-queue",
-      queuePosition: 0
-    }
+  // DEV: Not persisting user information after session-temporary.
+  playerState[username] = {
+    score: 0,
+    rounds: 0,
+    state: "in-queue",
+    queuePosition: 0
   }
+  // if (!playerState.hasOwnProperty(username)){
+  //   playerState[username] = {
+  //     score: 0,
+  //     rounds: 0,
+  //     state: "in-queue",
+  //     queuePosition: 0
+  //   }
+  // }
+  // else {
+  //   ws.send(JSON.stringify({
+  //     state: "duplicate-username",
+  //     message: "Username already taken"
+  //   }))
+  //   return
+  // }
   
   if (currentPlayer === null){
     currentPlayer = username
     playerState[username]["state"] = "in-game"
 
     initiateRound(username)
+    return
+  }
+
+  else {
+    // temporary
+    ws.send(JSON.stringify({
+      state: "waiting",
+      message: "Someone else is already playing, wait for them to finish!"
+    }))
     return
   }
 
@@ -177,6 +202,6 @@ wss.on("close", ws => {
   console.log(ws)
 })
 
-app.get('/', (req, res) => res.send('Hello'))
+app.get('/', (req, res) => "hello")
 
 server.listen(8080, () => console.log(`Lisening on port: 8080`))
