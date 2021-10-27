@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Nova+Round&family=Vast+Shadow&family=Yanone+Kaffeesatz:wght@300&display=swap');
+
+@font-face {
+    font-family: KungFuMaster;
+    src: url("../KungFuMaster.otf") format("opentype");
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5,22 +12,107 @@
 }
 
 body {
-    background-image: url("../images/funky-lines.png");
-    background-repeat: repeat;
+    padding-top: 20px;
+    background-image: url("../images/y-so-serious-white.png");
+    font-family: 'Nova Round', cursive;
+}
+
+header {
+    font-family: 'Nova Round', cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+header h1 {
+    font-size: 25px;
 }
 
 main {
-
-    height: 100vh;
-    width: 100vw;
+    margin-top: 40px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.container {
+main div {
+    margin: 20px 0;
+}
+
+#username-form {
     display: flex;
     flex-direction: column;
+}
+
+input {
+    font-size: 26px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 20px;
+    color: rgb(75, 75, 75);
+}
+
+button {
+    color: #fff;
+    background: rgb(0, 132, 255);
+    border-radius: 10px;
+    font-size: 35px;
+    font-family: 'Nova Round', cursive;
+}
+
+button:hover{
+    cursor: pointer;
+}
+
+#instructions {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.div-heading {
+    font-size: 30px;
+    margin: 10px 0;
+    color: #A2012D;
+}
+
+.result {
+    font-size: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#rounds-span {
+    color: rgb(255, 0, 0);
+}
+
+#score-span {
+    color: rgb(30, 255, 0);
+}
+
+#in-game {
+    text-align: center;
+}
+
+#in-game h1{
+    font-size: 40px;
+    margin-bottom: 50px;
+    color: #690167;
+}
+
+.name-input-div {
+    display: flex;
+    flex-direction: column;
+}
+
+ul {
+    text-align: left;
+    margin: 0 15%;
+}
+
+li {
+    margin: 5px 0;
 }
 
 .invis {

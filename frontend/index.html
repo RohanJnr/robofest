@@ -9,31 +9,45 @@
     <script src="static/js/script.js" defer></script>
 </head>
 <body>
+    <div class="bg-image"></div>
+    <header>
+        <div class="ieee-logo">
+            <img src="static/images/ieee.png" alt="" width="100" height="auto">
+        </div>
+        <h1>Rock, Paper N Scissors</h1>
+        <div class="rps-logo">
+            <img src="static/images/rps2.png" alt="" width="100" height="auto">
+        </div>
+    </header>
+
     <main class="showcase">
-        <div class="container">
-
-            <div class="form">
-                <form id="username-form">
-                    <h1 id="form-heading"></h1>
-                    <label for="username">username</label>
-                    <input type="text" id="username-input">
-
-                    <button type="submit">Play</button>
-                </form>
+            <div id="name-input" class="name-input-div">
+                <input type="text" id="username-input" placeholder="Your name">
+                <button type="submit" id="play-button">Play</button>
             </div>
 
-            <div class="content invis" id="info">
-                <h1 id="content-heading-1"></h1>
-                <p id="content-p"></p>
-                <h2 id="content-heading-2"></h2>
-                <button type="button" id="play-button" class="invis">Play</button>
-                <div class="score">
-                    <p>Score: <span id="score-value">0</span></p>
-                    <p>Round: <span id="round-value">0</span></p>
+            <div class="invis" id="in-game">
+                <h1 class="div-heading" id="score-heading">User</h1>
+                <h2>Your Score</h2>
+                <div class="result">
+                    <p>Rounds: <span id="rounds-span">5</span></p>
+                    <p>Score: <span id="score-span">3</span></p>
                 </div>
             </div>
-        </div>
 
+            <div id="instructions">
+                <h1 class="div-heading">Instructions</h1>
+                <ul>
+                    <li>Register your name and begin to play to win gifts and goodies.</li>
+                    <li>There will be a total of 6 rounds for each player.</li>
+                    <ul>
+                        <li>Win: 2 Points</li>
+                        <li>Tie: 1 Point</li>
+                    </ul>
+                    <li>You will get a 3 second timer before each round. Show your gesture in front of laptop webcam. At the 0th second, gesture will be recorded and the robot will also make its move.</li>
+                    <li>Your score can be seen at the end of each round.</li>
+                </ul>
+            </div>
     </main>
 
 </body>

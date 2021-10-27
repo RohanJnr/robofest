@@ -62,6 +62,7 @@ function dashboardInfo() {
 
 
   console.log(dashinfo)
+  console.log(Object.keys(playerState).length)
   // TODO send to camera/image processing client.
   // ...
 
@@ -71,51 +72,58 @@ function playProtocol(data, ws) {
   // Client willing to play a game.
   const username = data.username
 
-  usernameWsMap[username] = ws
-
-  // DEV: Not persisting user information after session-temporary.
-  playerState[username] = {
-    score: 0,
-    rounds: 0,
-    state: "in-queue",
-    queuePosition: 0
-  }
-  // if (!playerState.hasOwnProperty(username)){
-  //   playerState[username] = {
-  //     score: 0,
-  //     rounds: 0,
-  //     state: "in-queue",
-  //     queuePosition: 0
-  //   }
-  // }
-  // else {
-  //   ws.send(JSON.stringify({
-  //     state: "duplicate-username",
-  //     message: "Username already taken"
-  //   }))
-  //   return
-  // }
-  
-  if (currentPlayer === null){
-    currentPlayer = username
-    playerState[username]["state"] = "in-game"
-
-    initiateRound(username)
+  if (playerState.hasOwnProperty(username)){
+    ws.send(JSON.stringify({
+      "protocol": "alert",
+      "message": "Username already exists, try a different username."
+    }))
     return
   }
-
-  else {
-    // temporary
+  if (currentPlayer != null){
     ws.send(JSON.stringify({
-      state: "waiting",
-      message: "Someone else is already playing, wait for them to finish!"
+      protocol: "alert",
+      message: "Another user is currently playing his rounds, try again later."
     }))
     return
   }
 
-  activePlayerQueue.push(username)
+  usernameWsMap[username] = ws
 
-  playerState[username]["queuePosition"] = activePlayerQueue.indexOf(username) + 1
+  // DEV: Not persisting user information after session-temporary.
+  playerState[username] = {
+    protocol: "play",
+    score: 0,
+    rounds: 0,
+  }
+
+  currentPlayer = username
+  
+
+  ws.send(JSON.stringify(playerState[username]))
+
+}
+
+function resultProtocol(data) {
+  if (!currentPlayer)return
+
+  const ws = usernameWsMap[currentPlayer]
+  const username = currentPlayer
+
+  const winner = data.result
+  let score = 0
+
+  if (winner == "User")score=2
+  else if (winner == "Tie")score=1
+
+  playerState[currentPlayer].score += score
+  playerState[currentPlayer].rounds += 1
+
+  if (playerState[currentPlayer].rounds == 6){
+    playerState[currentPlayer].protocol = "done"
+    currentPlayer = null
+  }
+
+  
 
   ws.send(JSON.stringify(playerState[username]))
 
@@ -134,31 +142,6 @@ function startProtocol(data) {
   const username = data.username
 
 }
-
-function resultProtocol(data) {
-  playerState[currentPlayer].score += data.score
-  playerState[currentPlayer].rounds += 1
-  dashboardInfo()
-  if (playerState[currentPlayer].rounds % 3 !== 0){
-    // 1 match is 3 rounds.
-    console.log("Another round.")
-    initiateRound(currentPlayer)
-    return
-  }
-
-  else {
-    console.log("No rounds.")
-    // done playing 1 match
-    playerState[currentPlayer].state = "idle"
-    usernameWsMap[currentPlayer].send(JSON.stringify(playerState[currentPlayer]))
-
-    currentPlayer = null
-
-    dashboardInfo()
-  }
-  // broadcastState()
-}
-
 
 function broadcastState(){
   activePlayerQueue.forEach(username => {
@@ -186,10 +169,7 @@ wss.on('connection', ws => {
 
   ws.on('message', message => {
     let data = JSON.parse(message)
-    if (data.username === "camCamera-123456"){
-      camClient = ws
-      return
-    }
+
     protoclMap[data.protocol](data, ws)
     dashboardInfo()
   })

@@ -1,17 +1,16 @@
-
-const usernameForm = document.getElementById("username-form")
+const nameInputDiv = document.getElementById("name-input")
 const usernameInput = document.getElementById("username-input")
-const contentDiv = document.getElementById("info")
-
-const heading1 = document.getElementById("content-heading-1")
-const heading2 = document.getElementById("content-heading-2")
-const paragraph = document.getElementById("content-p")
-const score = document.getElementById("score-value")
-const round = document.getElementById("round-value")
+const inGameDiv = document.getElementById("in-game")
+const instructionsDiv = document.getElementById("instructions")
 
 
-const contentButton = document.getElementById("play-button")
-const formHeading = document.getElementById("form-heading")
+const scoreHeading = document.getElementById("score-heading")
+
+const scoreSpan = document.getElementById("score-span")
+const roundSpan = document.getElementById("rounds-span")
+
+
+const playButton = document.getElementById("play-button")
 
 const invisClass = "invis"
 
@@ -39,14 +38,40 @@ function setScoreRound(scoreValue, roundValue){
 }
 
 // states: in-queue, in-game, idle, awaiting-start, fail-start
-const stateMapping = {
-    "in-queue": inQueueState,
-    "in-game": inGameState,
-    "idle": idleState,
-    "awaiting-start": awaitingStartState,
-    "fail-start": failStartState,
-    "waiting": waitingState,
-    "duplicate-username": duplicateUsername,
+const protocolMapping = {
+    "play": playProtocol,
+    "done": doneProtocol,
+    "alert": alertProtocol
+}
+
+function alertProtocol(data){
+    alert(data.message)
+}
+
+function doneProtocol(data) {
+    scoreHeading.innerHTML = `
+    ${username}, thanks for playing!
+    IEEE and Robofest additional details: <a href="https://ieee-ras-pesu.github.io/website/">HERE</a>
+    `
+
+    updateScoreRounds(data)
+
+}
+
+function playProtocol(data){
+    nameInputDiv.classList.add(invisClass)
+    instructionsDiv.classList.add(invisClass)
+
+    inGameDiv.classList.remove(invisClass)
+
+    scoreHeading.innerHTML = username
+
+    updateScoreRounds(data)
+}
+
+function updateScoreRounds(data){
+    scoreSpan.innerHTML = data.score
+    roundSpan.innerHTML = data.rounds
 }
 
 function duplicateUsername(data) {
@@ -100,23 +125,16 @@ function failStartState(data) {
 }
 
 
-const ws = new WebSocket("ws://64.227.179.101:8080")
+const ws = new WebSocket("ws://localhost:8080")
 // const ws = new WebSocket("ws://localhost:8080")
 
 
-usernameForm.addEventListener("submit", event => {
-    event.preventDefault()
-    username = usernameInput.value
-    // document.cookie = username
-    ws.send(JSON.stringify(
-        {
-            protocol: "play",
-            username
-        }
-        ))
-})
-
-contentButton.addEventListener("click", event => {
+playButton.addEventListener("click", event => {
+    username = usernameInput.value.trim()
+    if (!username){
+        alert("Please provide a valid username.")
+        return
+    }
     ws.send(JSON.stringify(
         {
             protocol: "play",
@@ -134,6 +152,5 @@ ws.addEventListener("message", event => {
     const data = JSON.parse(event.data)
     console.log(data)
 
-    state = data.state
-    stateMapping[state](data)
+    protocolMapping[data.protocol](data)
 })
